@@ -1,6 +1,6 @@
 > # --- CHALLENGES OF FORENSICS ---
 
-![image](https://user-images.githubusercontent.com/62060867/115960582-6ff6d400-a53c-11eb-9a9f-fabe273fcb67.png)
+![image](https://user-images.githubusercontent.com/62060867/116218239-88e9ca00-a774-11eb-87ac-e86552bb625c.png)
 
 # 1. Oldest trick in the book
 [Forensics_Oldest_Trick.zip](https://github.com/Stirring16/CTF-Hack-The-Box-Cyber-Apocalypse-2021/files/6369734/forensics_oldest_trick.zip)
