@@ -393,25 +393,4 @@ Goodjob!!!
 > # So we got the flag: CHTB{b4ckd00r5_4r3_d4nG3r0u5}
 
 
-* 
-# 4.Alienware
 
-[rev_alienware.zip](https://github.com/Stirring16/CTF-Hack-The-Box-Cyber-Apocalypse-2021/files/6386440/rev_alienware.zip)
-
-![image](https://user-images.githubusercontent.com/62060867/116285123-071b9000-a7b8-11eb-81e1-89a150187b3f.png)
-
-* Thử thách này cho ta một một file PE32+ và file encrypted 
-
-```
-┌──(kali㉿kali)-[~/Desktop/ReverseHTB/rev_alienware]
-└─$ file *                     
-Alienware.exe:          PE32+ executable (console) x86-64, for MS Windows
-Confidential.pdf.alien: data
-
-```
-
-* Phân tích funtion `TlsCallBack_0()`
-
-![image](https://user-images.githubusercontent.com/62060867/116287016-1996c900-a7ba-11eb-9fae-982be2e2b9a9.png)
-
-* Nhìn vào mình thấy nó tải một resource, giải mã nó và lưu trữ trên đĩa dưới dạng `xuTaV.dll`, sau đó nó load với `LoadLibrary` và nhận địa chỉ để xuất funtions `encryptFiles`
