@@ -344,8 +344,8 @@ while True:
         client, addr = sock.accept()
         data = client.recv(32).decode().rstrip("\n")
 
-        if(data != md5(b's4v3_th3_w0rld').hexdigest()):
-            client.sendall('Invalid').encode()
+        if(data != 's4v3_th3_w0rld'):
+            client.sendall('Invalid')
             client.close()
         else:
             command = client.recv(1024)
@@ -357,6 +357,42 @@ while True:
                 client.send(output)
                 client.close()
 ```
+
+* Ok, Netcat để check xem có flag không:  `s4v3_th3_w0rld` -> `command:ls`
+
+```                                                      
+┌──(kali㉿kali)-[~/Desktop]
+└─$ nc -vvv 0.0.0.0 1234                               
+0.0.0.0: inverse host lookup failed: Unknown host
+(UNKNOWN) [0.0.0.0] 1234 (?) open
+s4v3_th3_w0rld
+command:ls
+bd
+fixbd.py
+flag.txt
+pydata.dump
+pydata.dump_extracted
+pyinstxtractor
+python-decompile3
+ sent 26, rcvd 88
+```
+
+* Oh, file Flag.txt 
+```                                                               
+┌──(kali㉿kali)-[~/Desktop]
+└─$ nc -vvv 0.0.0.0 1234                                   
+0.0.0.0: inverse host lookup failed: Unknown host
+(UNKNOWN) [0.0.0.0] 1234 (?) open
+s4v3_th3_w0rld
+command:cat flag.txt
+CHTB{b4ckd00r5_4r3_d4nG3r0u5}
+Goodjob!!!
+ sent 36, rcvd 41
+
+```
+> # So we got the flag: CHTB{b4ckd00r5_4r3_d4nG3r0u5}
+
+
 * 
 # 4.Alienware
 
